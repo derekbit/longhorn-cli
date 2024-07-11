@@ -24,10 +24,10 @@ jobs:
 
     # Calculate sha256 and sha12 checksum
     - name: Create sha256 checksum
-      run: mkdir -p checksum && for i in *; do sha256sum -b ./bin/$i > "./checksum/$i.sha256"; done
+      run: mkdir -p checksum && for i in ./bin/*; do sha256sum -b ./bin/$i > "./checksum/$i.sha256"; done
 
     - name: Create sha512 checksum
-      run: mkdir -p checksum && for i in *; do sha512sum -b ./bin/$i > "./checksum/$i.sha512"; done
+      run: mkdir -p checksum && for i in ./bin/*; do sha512sum -b ./bin/$i > "./checksum/$i.sha512"; done
 
     # Upload binaries to release
     - name: Upload binaries to release
