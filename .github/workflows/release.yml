@@ -1,0 +1,40 @@
+name: build
+on:
+  push:
+    tags:
+      - 'v*'
+  pull_request:
+jobs:
+  build:
+    name: Build binaries
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # Build binaries
+    - name: Run ci
+      run: make ci
+
+    - uses: codecov/codecov-action@v4
+      with:
+        files: ./coverage.out
+        flags: unittests
+        token: ${{ secrets.CODECOV_TOKEN }}
+
+    # Calculate sha256 and sha12 checksum
+    - name: Create sha256 checksum
+      run: mkdir -p checksum && cd bin && for i in *; do sha256sum -b $i > "../checksum/$i.sha256"; done && cd -
+
+    - name: Create sha512 checksum
+      run: mkdir -p checksum && cd bin && for i in *; do sha512sum -b $i > "../checksum/$i.sha512"; done && cd -
+
+    # Upload binaries to release
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: '{/bin/longhornctl*,checksum/longhornctl*}' 
+        tag: ${{ github.ref }}
+        overwrite: true
+        file_glob: true
