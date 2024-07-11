@@ -21,12 +21,20 @@ jobs:
         files: ./coverage.out
         flags: unittests
         token: ${{ secrets.CODECOV_TOKEN }}
+
+    # Calculate sha256 and sha12 checksum
+    - name: Create sha256 checksum
+      run: cd ./bin && for i in *; do sha256sum -b $i > "$i.sha256"; done && cd -
+
+    - name: Create sha512 checksum
+      run: cd ./bin && for i in *; do sha512sum -b $i > "$i.sha512"; done && cd -
+
     # Upload binaries to release
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ./bin/*
+        file: ./bin/longhornctl*
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
